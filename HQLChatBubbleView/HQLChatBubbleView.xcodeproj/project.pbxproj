@@ -13,6 +13,7 @@
 		4AB9B3641F050ABF0011F89E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AB9B3621F050ABF0011F89E /* Main.storyboard */; };
 		4AB9B3661F050ABF0011F89E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4AB9B3651F050ABF0011F89E /* Assets.xcassets */; };
 		4AB9B3691F050ABF0011F89E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AB9B3671F050ABF0011F89E /* LaunchScreen.storyboard */; };
+		4AB9B3761F050BC40011F89E /* HQLChatBubbleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB9B3751F050BC40011F89E /* HQLChatBubbleView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		4AB9B3651F050ABF0011F89E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4AB9B3681F050ABF0011F89E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4AB9B36A1F050ABF0011F89E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4AB9B3741F050BC40011F89E /* HQLChatBubbleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HQLChatBubbleView.h; sourceTree = "<group>"; };
+		4AB9B3751F050BC40011F89E /* HQLChatBubbleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HQLChatBubbleView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +61,7 @@
 		4AB9B3581F050ABF0011F89E /* HQLChatBubbleView */ = {
 			isa = PBXGroup;
 			children = (
+				4AB9B3701F050B8F0011F89E /* HQLChatBubbleView */,
 				4AB9B35C1F050ABF0011F89E /* AppDelegate.h */,
 				4AB9B35D1F050ABF0011F89E /* AppDelegate.m */,
 				4AB9B35F1F050ABF0011F89E /* ViewController.h */,
@@ -77,6 +81,31 @@
 				4AB9B35A1F050ABF0011F89E /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		4AB9B3701F050B8F0011F89E /* HQLChatBubbleView */ = {
+			isa = PBXGroup;
+			children = (
+				4AB9B3711F050B8F0011F89E /* Lib */,
+				4AB9B3721F050B8F0011F89E /* View */,
+			);
+			path = HQLChatBubbleView;
+			sourceTree = "<group>";
+		};
+		4AB9B3711F050B8F0011F89E /* Lib */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Lib;
+			sourceTree = "<group>";
+		};
+		4AB9B3721F050B8F0011F89E /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4AB9B3741F050BC40011F89E /* HQLChatBubbleView.h */,
+				4AB9B3751F050BC40011F89E /* HQLChatBubbleView.m */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -153,6 +182,7 @@
 			files = (
 				4AB9B3611F050ABF0011F89E /* ViewController.m in Sources */,
 				4AB9B35E1F050ABF0011F89E /* AppDelegate.m in Sources */,
+				4AB9B3761F050BC40011F89E /* HQLChatBubbleView.m in Sources */,
 				4AB9B35B1F050ABF0011F89E /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,6 +342,7 @@
 				4AB9B36F1F050ABF0011F89E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
