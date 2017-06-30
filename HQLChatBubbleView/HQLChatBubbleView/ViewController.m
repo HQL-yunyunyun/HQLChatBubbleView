@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 
+#import "HQLChatBubbleBackgroundView.h"
+
 @interface ViewController ()
 
 @end
@@ -16,7 +18,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    self.view.backgroundColor = [UIColor redColor];
+    
+    HQLChatBubbleBackgroundView *backView = [[HQLChatBubbleBackgroundView alloc] initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, 200)];
+    backView.backgroundColor = [UIColor blueColor];
+    
+    [backView drawBubble];
+    [self.view addSubview:backView];
 }
 
 
