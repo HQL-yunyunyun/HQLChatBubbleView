@@ -8,6 +8,8 @@
 
 #import "HQLChatBubbleBackgroundView.h"
 
+#define kAngle(angle) ((angle) / 180.0 * M_PI)
+
 @interface HQLChatBubbleBackgroundView ()
 
 @property (strong, nonatomic) CAShapeLayer *maskLayer; // layer
@@ -46,7 +48,7 @@
 
 - (void)viewConfig {
     self.tailWidth = 5;
-    self.tailHeight = 8;
+    self.tailHeight = 5;
     self.viewCornerRadius = 10;
     self.tailTopMargin = 10;
     
@@ -78,22 +80,54 @@
     CGPathAddArcToPoint(path, NULL, width, height, width - self.viewCornerRadius, height, self.viewCornerRadius);
     
     CGPathAddLineToPoint(path, NULL, self.viewCornerRadius + self.tailWidth, height);
-    CGPathAddArcToPoint(path, NULL, self.tailWidth, height, self.tailWidth, height - self.viewCornerRadius, self.viewCornerRadius);
+    
+    /***/
+    
+    CGPoint pointD = CGPointMake(self.viewCornerRadius + self.tailWidth, height);
+    
+//    CGPoint pointA = CGPointMake(self.viewCornerRadius + self.tailWidth - self.viewCornerRadius * 0.6, height - self.viewCornerRadius * 0.3);
+    
+    
+    CGPoint center4 = CGPointMake(self.tailWidth + self.viewCornerRadius, height - self.viewCornerRadius);
+    
+    UIView *center4View = [[UIView alloc] initWithFrame:CGRectMake(center4.x - 0.5, center4.y - 0.5, 1, 1)];
+    [center4View setBackgroundColor:[UIColor yellowColor]];
+//    [self addSubview:center4View];
+    
+    CGPoint pointA = [self getArcPointWithCenterPoint:center4 radius:self.viewCornerRadius radian:(kAngle(325))];
+    
+    UIView *pointAView = [[UIView alloc] initWithFrame:CGRectMake(pointA.x - 0.5, pointA.y - 0.5, 1, 1)];
+    pointAView.backgroundColor = [UIColor blackColor];
+//    [self addSubview:pointAView];
+    
+    CGPoint pointB = CGPointMake(0, height);
+    CGPoint center = [self getTwoPointArcCenterPointWithPointA:pointA pointB:pointB arcDirectionUpOrDown:NO];
+    
+    CGPoint center3 = [self getTwoPointArcCenterPointWithPointA:pointD pointB:pointA arcDirectionUpOrDown:NO];
+//    CGPathAddCurveToPoint(path, NULL, pointD.x, pointD.y, center3.x, center3.y, pointA.x, pointA.y);
+    
+    CGPathAddArc(path, NULL, self.tailWidth + self.viewCornerRadius, height - self.viewCornerRadius, self.viewCornerRadius, (kAngle(325)), (kAngle(270)), NO);
+    
+    CGPoint pointE = [self getArcPointWithCenterPoint:center4 radius:self.viewCornerRadius radian:kAngle(270 + 45 + 22.5)];
+    
+    UIView *poineEView = [[UIView alloc] initWithFrame:CGRectMake(pointE.x - 0.5, pointE.y - 0.5, 1, 1)];
+    poineEView.backgroundColor = [UIColor redColor];
+//    [self addSubview:poineEView];
+    
+//    CGPathAddArcToPoint(path, NULL, pointE.x, pointE.y, pointA.x, pointA.y, self.viewCornerRadius);
+    
+//    CGPathAddArcToPoint(path, NULL, self.viewCornerRadius + self.tailWidth - self.viewCornerRadius * 0.5, height, pointA.x, pointA.y, self.viewCornerRadius * 0.5);
+    
+    CGPathAddCurveToPoint(path, NULL, pointA.x, pointA.y, center.x, center.y, pointB.x, pointB.y);
+    
+    CGPoint pointC = CGPointMake(self.tailWidth, height - self.viewCornerRadius * 0.5);
+    CGPoint center2 = [self getTwoPointArcCenterPointWithPointA:pointB pointB:pointC arcDirectionUpOrDown:NO];
+    
+    CGPathAddCurveToPoint(path, NULL, pointB.x, pointB.y, center2.x, center2.y, pointC.x, pointC.y);
+    /***/
     
     CGPathAddLineToPoint(path, NULL, self.tailWidth, self.viewCornerRadius);
-    CGPathAddArcToPoint(path, NULL, self.tailWidth, 0, self.viewCornerRadius + self.tailWidth, 0, self.viewCornerRadius);
-    
-    CGPathMoveToPoint(path, NULL, self.tailWidth, self.tailTopMargin + self.tailHeight);
-    
-    CGPathAddArcToPoint(path, NULL, 0, self.tailTopMargin + self.tailHeight, 0, (self.tailTopMargin + self.tailHeight - self.tailWidth), self.tailWidth);
-    
-//    CGPathAddLineToPoint(path, NULL, 0, self.tailTopMargin + self.tailHeight * 0.5);
-//    
-//    CGFloat x = [self getArcXWithArcCenter:CGPointMake(self.viewCornerRadius + self.tailWidth, self.viewCornerRadius) arcY:self.tailTopMargin radius:self.viewCornerRadius];
-//    
-//    CGPathAddLineToPoint( path, NULL, x, self.tailTopMargin);
-    
-//    CGPathCloseSubpath(path);
+    CGPathAddArcToPoint(path, NULL, self.tailWidth, 0, self.tailWidth + self.viewCornerRadius, 0, self.viewCornerRadius);
     
     self.maskLayer.path = path;
 }
@@ -106,8 +140,20 @@
 
 #pragma mark - tool method
 
+- (CGPoint)getArcPointWithCenterPoint:(CGPoint)centerPoint radius:(CGFloat)radius radian:(double)radian {
+    CGFloat x = centerPoint.x + radius * sin(radian);
+    CGFloat y = centerPoint.y + radius * cos(radian);
+    return CGPointMake(x, y);
+}
+
+- (CGFloat)getTwoPointDistanceWithPointA:(CGPoint)pointA pointB:(CGPoint)pointB {
+    CGFloat xLine = fabs(pointA.x - pointB.x);
+    CGFloat yLine = fabs(pointA.y - pointB.y);
+    return sqrt(pow(xLine, 2) + pow(yLine, 2));
+}
+
 // 求两点的中点(弧线的坐标) ， yesOrNo - yes就是向上弯 no就是向下弯
-- (CGPoint)getTwoPointArcCenterPointWitPointA:(CGPoint)pointA pointB:(CGPoint)pointB arcDirectionUpOrDown:(BOOL)yesOrNo {
+- (CGPoint)getTwoPointArcCenterPointWithPointA:(CGPoint)pointA pointB:(CGPoint)pointB arcDirectionUpOrDown:(BOOL)yesOrNo {
     if (pointA.x == pointB.x) {
         return CGPointMake(pointA.x, fabs(pointA.y - pointB.y) * 0.5);
     } else if (pointA.y == pointB.y) {
@@ -140,9 +186,45 @@
         bottomPoint2.x = topPoint.x;
     }
     
+    // 直线方程一般式 y = kx + b --- k为斜率
+    // 计算k 跟 b
+    // k = (y1 - y2)/(x1 - x2)
+    // b = y1 - (y1 - y2)/(x1 - x2) * x1
+    // 如果x1 - x2 == 0 则直线平行于x轴 k = 0 , b = y1
+    CGFloat topK , topB;
     
+    if (topPoint.x - topPoint2.x == 0) {
+        topK = 0;
+        topB = topPoint.y;
+    } else {
+        topK = (topPoint.y - topPoint2.y) / (topPoint.x - topPoint2.x);
+        topB = topPoint.y - (topPoint.y - topPoint2.y) / (topPoint.x - topPoint2.x) * topPoint.x;
+    }
     
-    return CGPointZero;
+    CGFloat bottomK , bottomB;
+    if (bottomPoint.x - bottomPoint2.x == 0) {
+        bottomK = 0;
+        bottomB = bottomPoint.y;
+    } else {
+        bottomK = (bottomPoint.y - bottomPoint2.y) / (bottomPoint.x - bottomPoint2.x);
+        bottomB = bottomPoint.y - (bottomPoint.y - bottomPoint2.y) / (bottomPoint.x - bottomPoint2.x) * bottomPoint.x;
+    }
+    
+    if (bottomK == topK) { // 斜率相等 两直线平行
+        return CGPointZero;
+    }
+    
+    // 求相交坐标
+    // y = ax + b和y = cx + d两条直线的交点
+    // x = (d - b)/(a - c)
+    // y = a(d - b)/(a - c) + b;
+    if (topK - bottomK == 0) {
+        return CGPointZero;
+    } else {
+        CGFloat x = (bottomB - topB) / (topK - bottomK);
+        CGFloat y = topK * (bottomB - topB) / (topK - bottomK) + topB;
+        return CGPointMake(x, y);
+    }
 }
 
 // 根据圆轨迹方程 获得x
