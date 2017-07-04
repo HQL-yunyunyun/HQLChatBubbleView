@@ -9,6 +9,17 @@
 #import "HQLChatBubbleBackgroundView.h"
 
 #define kAngle(angle) ((angle) / 180.0 * M_PI)
+#define kiMessageArcAngle 40
+
+#define kMinViewWidth 20
+#define kMinViewHeight 20
+
+typedef enum {
+    HQLPointPositionInCircleRightTop, // 右上角
+    HQLPointPositionInCircleLeftTop, // 左上角
+    HQLPointPositionInCircleRightDown, // 右下角
+    HQLPointPositionInCircleLeftDown, // 左下角
+} HQLPointPositionInCircle;
 
 @interface HQLChatBubbleBackgroundView ()
 
@@ -57,85 +68,347 @@
     self.contentViewBottomMargin = 0;
     self.contentViewRightMargin = 0;
     
-    self.fillColor = [UIColor whiteColor];
-    self.borderColor = nil;
-    self.borderWidth = 0;
+    self.fillColor = [UIColor blueColor];
 }
 
 - (void)drawBubble {
-//    if (!self.contentView) {
-//        return;
-//    }
+    if (!self.contentView) {
+        return;
+    }
     
-    CGFloat width = 100;
-    CGFloat height = 100;
+    CGFloat width = self.contentView.frame.size.width + self.contentViewLeftMargin + self.contentViewRightMargin;
+    if (width < 2 * self.viewCornerRadius) {
+        width = 2 * self.viewCornerRadius;
+    }
+    if (width < kMinViewWidth) {
+        width = kMinViewWidth;
+    }
     
-    CGMutablePathRef path = CGPathCreateMutable();
+    CGFloat height = self.contentView.frame.size.height + self.contentViewTopMargin + self.contentViewBottomMargin;
+    if (height < 2 * self.viewCornerRadius) {
+        height = 2 * self.viewCornerRadius;
+    }
+    if (height < kMinViewHeight) {
+        height = kMinViewHeight;
+    }
     
-    CGPathMoveToPoint(path, NULL, self.viewCornerRadius + self.tailWidth, 0);
-    CGPathAddLineToPoint(path, NULL, width - self.viewCornerRadius, 0);
-    CGPathAddArcToPoint(path, NULL, width, 0, width, self.viewCornerRadius, self.viewCornerRadius);
-    
-    CGPathAddLineToPoint(path, NULL, width, height - self.viewCornerRadius);
-    CGPathAddArcToPoint(path, NULL, width, height, width - self.viewCornerRadius, height, self.viewCornerRadius);
-    
-    CGPathAddLineToPoint(path, NULL, self.viewCornerRadius + self.tailWidth, height);
-    
-    /***/
-    
-    CGPoint pointD = CGPointMake(self.viewCornerRadius + self.tailWidth, height);
-    
-//    CGPoint pointA = CGPointMake(self.viewCornerRadius + self.tailWidth - self.viewCornerRadius * 0.6, height - self.viewCornerRadius * 0.3);
+    if (self.tailHeight > height) {
+        self.tailHeight = 5;
+    }
+    if (self.tailTopMargin + self.tailHeight > height) {
+        self.tailTopMargin = self.viewCornerRadius;
+    }
     
     
-    CGPoint center4 = CGPointMake(self.tailWidth + self.viewCornerRadius, height - self.viewCornerRadius);
+    CGSize size = CGSizeMake(width, height);
     
-    UIView *center4View = [[UIView alloc] initWithFrame:CGRectMake(center4.x - 0.5, center4.y - 0.5, 1, 1)];
-    [center4View setBackgroundColor:[UIColor yellowColor]];
-//    [self addSubview:center4View];
+    self.contentView.frame = CGRectMake(self.contentViewLeftMargin, self.contentViewTopMargin, self.contentView.frame.size.width, self.contentView.frame.size.height);
     
-    CGPoint pointA = [self getArcPointWithCenterPoint:center4 radius:self.viewCornerRadius radian:(kAngle(325))];
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, width, height);
     
-    UIView *pointAView = [[UIView alloc] initWithFrame:CGRectMake(pointA.x - 0.5, pointA.y - 0.5, 1, 1)];
-    pointAView.backgroundColor = [UIColor blackColor];
-//    [self addSubview:pointAView];
+    if ([self.delegate respondsToSelector:@selector(chatBubbleBackgroundViewDidChangeFrame:)]) {
+        [self.delegate chatBubbleBackgroundViewDidChangeFrame:self];
+    }
     
-    CGPoint pointB = CGPointMake(0, height);
-    CGPoint center = [self getTwoPointArcCenterPointWithPointA:pointA pointB:pointB arcDirectionUpOrDown:NO];
-    
-    CGPoint center3 = [self getTwoPointArcCenterPointWithPointA:pointD pointB:pointA arcDirectionUpOrDown:NO];
-//    CGPathAddCurveToPoint(path, NULL, pointD.x, pointD.y, center3.x, center3.y, pointA.x, pointA.y);
-    
-    CGPathAddArc(path, NULL, self.tailWidth + self.viewCornerRadius, height - self.viewCornerRadius, self.viewCornerRadius, (kAngle(325)), (kAngle(270)), NO);
-    
-    CGPoint pointE = [self getArcPointWithCenterPoint:center4 radius:self.viewCornerRadius radian:kAngle(270 + 45 + 22.5)];
-    
-    UIView *poineEView = [[UIView alloc] initWithFrame:CGRectMake(pointE.x - 0.5, pointE.y - 0.5, 1, 1)];
-    poineEView.backgroundColor = [UIColor redColor];
-//    [self addSubview:poineEView];
-    
-//    CGPathAddArcToPoint(path, NULL, pointE.x, pointE.y, pointA.x, pointA.y, self.viewCornerRadius);
-    
-//    CGPathAddArcToPoint(path, NULL, self.viewCornerRadius + self.tailWidth - self.viewCornerRadius * 0.5, height, pointA.x, pointA.y, self.viewCornerRadius * 0.5);
-    
-    CGPathAddCurveToPoint(path, NULL, pointA.x, pointA.y, center.x, center.y, pointB.x, pointB.y);
-    
-    CGPoint pointC = CGPointMake(self.tailWidth, height - self.viewCornerRadius * 0.5);
-    CGPoint center2 = [self getTwoPointArcCenterPointWithPointA:pointB pointB:pointC arcDirectionUpOrDown:NO];
-    
-    CGPathAddCurveToPoint(path, NULL, pointB.x, pointB.y, center2.x, center2.y, pointC.x, pointC.y);
-    /***/
-    
-    CGPathAddLineToPoint(path, NULL, self.tailWidth, self.viewCornerRadius);
-    CGPathAddArcToPoint(path, NULL, self.tailWidth, 0, self.tailWidth + self.viewCornerRadius, 0, self.viewCornerRadius);
-    
-    self.maskLayer.path = path;
+    switch (self.style) {
+        case HQLChatBubbleViewWeChatStyle: {
+            self.maskLayer.path = [self createBubbleWechatStylePathWithSize:size];
+            break;
+        }
+        case HQLChatBubbleViewQQStyle: {
+            self.maskLayer.path = [self createBubbleQQStylePathWithSize:size];
+            break;
+        }
+        case HQLChatBubbleViewiMessageStyle: {
+            self.maskLayer.path = [self createBubbleiMessageStylePathWithSize:size];
+            break;
+        }
+    }
 }
 
 - (void)drawBubbleWithContentView:(UIView *)contentView tailPosition:(HQLChatBubbleViewTailPosition)tailPosition {
+    // 将以前的contentView移除
+    [self.contentView removeFromSuperview];
+    [self addSubview:contentView];
+    
     self.contentView = contentView;
     self.tailPosition = tailPosition;
     [self drawBubble];
+}
+
+#pragma mark - create path method
+
+// 创建iMessage样式的path
+- (CGMutablePathRef)createBubbleiMessageStylePathWithSize:(CGSize)pathSize {
+    CGMutablePathRef path = CGPathCreateMutable();
+    
+    CGPoint firstCornerEndPoint, firstCornerBeginPoint, firstCornerMidPoint;
+    CGPoint secondCornerBeginPoint, secondCornerMidPoint, secondCornerEndPoint;
+    CGPoint thirdCornerBeginPoint, thirdCornerMidPoint, thirdCornerEndPoint;
+    CGPoint fourthCornerBeginPoint;
+    CGPoint tailBottomBeginPoint, tailTipPoint, tailTopEndPoint;
+    
+    CGPoint tailArcCenterPoint;
+    
+    CGFloat startAngle, endAngle;
+    
+    CGFloat leftX, rightX; // 每个点在框上的 就是边边的x
+    
+    BOOL closewise;
+    
+    switch (self.tailPosition) {
+        case HQLChatBubbleViewTailPositionLeft: {
+            leftX = self.tailWidth;
+            
+            firstCornerBeginPoint = CGPointMake(leftX, self.viewCornerRadius);
+            firstCornerMidPoint = CGPointMake(leftX, 0);
+            firstCornerEndPoint = CGPointMake(leftX + self.viewCornerRadius, 0);
+            
+            secondCornerBeginPoint = CGPointMake(pathSize.width - self.viewCornerRadius, 0);
+            secondCornerMidPoint = CGPointMake(pathSize.width, 0);
+            secondCornerEndPoint = CGPointMake(pathSize.width, self.viewCornerRadius);
+            
+            thirdCornerBeginPoint = CGPointMake(pathSize.width, pathSize.height - self.viewCornerRadius);
+            thirdCornerMidPoint = CGPointMake(pathSize.width, pathSize.height);
+            thirdCornerEndPoint = CGPointMake(pathSize.width - self.viewCornerRadius, pathSize.height);
+            
+            fourthCornerBeginPoint = CGPointMake(leftX + self.viewCornerRadius, pathSize.height);
+            
+            tailArcCenterPoint = CGPointMake(leftX + self.viewCornerRadius, pathSize.height - self.viewCornerRadius);
+            
+            tailBottomBeginPoint = [self getArcPointWithCenterPoint:tailArcCenterPoint radius:self.viewCornerRadius radian:kAngle(-kiMessageArcAngle)];
+            tailTipPoint = CGPointMake(0, pathSize.height);
+            tailTopEndPoint = CGPointMake(leftX, pathSize.height - self.viewCornerRadius * 0.5);
+            
+            startAngle = kAngle(90);
+            endAngle = kAngle(90 + kiMessageArcAngle);
+            closewise = NO;
+            
+            break;
+        }
+        case HQLChatBubbleViewTailPositionRight: {
+            rightX = pathSize.width - self.tailWidth;
+            
+            firstCornerBeginPoint = CGPointMake(rightX, self.viewCornerRadius);
+            firstCornerMidPoint = CGPointMake(rightX, 0);
+            firstCornerEndPoint = CGPointMake(rightX - self.viewCornerRadius, 0);
+            
+            secondCornerBeginPoint = CGPointMake(self.viewCornerRadius, 0);
+            secondCornerMidPoint = CGPointMake(0, 0);
+            secondCornerEndPoint = CGPointMake(0, self.viewCornerRadius);
+            
+            thirdCornerBeginPoint = CGPointMake(0, pathSize.height - self.viewCornerRadius);
+            thirdCornerMidPoint = CGPointMake(0, pathSize.height);
+            thirdCornerEndPoint = CGPointMake(self.viewCornerRadius, pathSize.height);
+            
+            fourthCornerBeginPoint = CGPointMake(rightX - self.viewCornerRadius, pathSize.height);
+            
+            tailArcCenterPoint = CGPointMake(rightX - self.viewCornerRadius, pathSize.height - self.viewCornerRadius);
+            
+            tailBottomBeginPoint = [self getArcPointWithCenterPoint:tailArcCenterPoint radius:self.viewCornerRadius radian:kAngle(kiMessageArcAngle)];
+            tailTipPoint = CGPointMake(pathSize.width, pathSize.height);
+            tailTopEndPoint = CGPointMake(rightX, pathSize.height - self.viewCornerRadius * 0.5);
+            
+            startAngle = kAngle(90);
+            endAngle = kAngle(90 - kiMessageArcAngle);
+            closewise = YES;
+            
+            break;
+        }
+    }
+    
+    CGPathMoveToPoint(path, NULL, firstCornerEndPoint.x, firstCornerEndPoint.y);
+    CGPathAddLineToPoint(path, NULL, secondCornerBeginPoint.x, secondCornerBeginPoint.y);
+    CGPathAddArcToPoint(path, NULL, secondCornerMidPoint.x, secondCornerMidPoint.y, secondCornerEndPoint.x, secondCornerEndPoint.y, self.viewCornerRadius);
+    
+    CGPathAddLineToPoint(path, NULL, thirdCornerBeginPoint.x, thirdCornerBeginPoint.y);
+    CGPathAddArcToPoint(path, NULL, thirdCornerMidPoint.x, thirdCornerMidPoint.y, thirdCornerEndPoint.x, thirdCornerEndPoint.y, self.viewCornerRadius);
+    
+    CGPathAddArc(path, NULL, tailArcCenterPoint.x, tailArcCenterPoint.y, self.viewCornerRadius, startAngle, endAngle, closewise);
+    
+    CGPoint tailBottomMidPoint = [self getTwoPointArcCenterPointWithPointA:tailBottomBeginPoint pointB:tailTipPoint arcDirectionUpOrDown:NO];
+    CGPathAddCurveToPoint(path, NULL, tailBottomBeginPoint.x, tailBottomBeginPoint.y, tailBottomMidPoint.x, tailBottomMidPoint.y, tailTipPoint.x, tailTipPoint.y);
+    
+    CGPoint tailTopMidPint = [self getTwoPointArcCenterPointWithPointA:tailTipPoint pointB:tailTopEndPoint arcDirectionUpOrDown:NO];
+    CGPathAddCurveToPoint(path, NULL, tailTipPoint.x, tailTipPoint.y, tailTopMidPint.x, tailTopMidPint.y, tailTopEndPoint.x, tailTopEndPoint.y);
+    
+    CGPathAddLineToPoint(path, NULL, firstCornerBeginPoint.x, firstCornerBeginPoint.y);
+    CGPathAddArcToPoint(path, NULL, firstCornerMidPoint.x, firstCornerMidPoint.y, firstCornerEndPoint.x, firstCornerEndPoint.y, self.viewCornerRadius);
+    
+    return path;
+}
+
+// 三角形
+- (CGMutablePathRef)createBubbleWechatStylePathWithSize:(CGSize)size {
+    CGMutablePathRef path = [self createCornerPathWithSize:size];
+    
+    CGPoint topPoint, bottomPoint, midPoint;
+    
+    midPoint = CGPointMake(0, self.tailTopMargin + self.tailHeight * 0.5);
+    topPoint = CGPointMake(0, self.tailTopMargin);
+    bottomPoint = CGPointMake(0, self.tailTopMargin + self.tailHeight);
+    
+    switch (self.tailPosition) {
+        case HQLChatBubbleViewTailPositionLeft: {
+            CGPoint topCenter = CGPointMake(self.tailWidth + self.viewCornerRadius, self.viewCornerRadius);
+            CGPoint bottomCenter = CGPointMake(self.tailWidth + self.viewCornerRadius, size.height - self.viewCornerRadius);
+            
+            if (self.tailTopMargin < self.viewCornerRadius) {
+                topPoint.x = [self getArcXWithArcCenter:topCenter arcY:topPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleLeftTop];
+            } else if (self.tailTopMargin > size.height - self.viewCornerRadius) {
+                topPoint.x = [self getArcXWithArcCenter:bottomCenter arcY:topPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleLeftDown];
+            } else {
+                topPoint.x = self.tailWidth;
+            }
+            
+            if (self.tailTopMargin + self.tailHeight < self.viewCornerRadius) {
+                bottomPoint.x = [self getArcXWithArcCenter:topCenter arcY:bottomPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleLeftTop];
+            } else if (self.tailTopMargin + self.tailHeight > size.height - self.viewCornerRadius) {
+                bottomPoint.x = [self getArcXWithArcCenter:bottomCenter arcY:bottomPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleLeftDown];
+            } else {
+                bottomPoint.x = self.tailWidth;
+            }
+            
+            midPoint.x = 0;
+            
+            break;
+        }
+        case HQLChatBubbleViewTailPositionRight: {
+            
+            CGPoint topCenter = CGPointMake(size.width - self.tailWidth - self.viewCornerRadius, self.viewCornerRadius);
+            CGPoint bottomCenter = CGPointMake(size.width - self.tailWidth - self.viewCornerRadius, size.height - self.viewCornerRadius);
+            
+            if (self.tailTopMargin < self.viewCornerRadius) {
+                topPoint.x = [self getArcXWithArcCenter:topCenter arcY:topPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleRightTop];
+            } else if (self.tailTopMargin > size.height - self.viewCornerRadius) {
+                topPoint.x = [self getArcXWithArcCenter:bottomCenter arcY:topPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleRightDown];
+            } else {
+                topPoint.x = size.width - self.tailWidth;
+            }
+            
+            if (self.tailTopMargin + self.tailHeight < self.viewCornerRadius) {
+                bottomPoint.x = [self getArcXWithArcCenter:topCenter arcY:bottomPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleRightTop];
+            } else if (self.tailTopMargin + self.tailHeight > size.height - self.viewCornerRadius) {
+                bottomPoint.x = [self getArcXWithArcCenter:bottomCenter arcY:bottomPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleRightDown];
+            } else {
+                bottomPoint.x = size.width - self.tailWidth;
+            }
+            
+            midPoint.x = size.width;
+            
+            break;
+        }
+    }
+    
+    CGPathMoveToPoint(path, NULL, topPoint.x, topPoint.y);
+    CGPathAddLineToPoint(path, NULL, midPoint.x, midPoint.y);
+    CGPathAddLineToPoint(path, NULL, bottomPoint.x, bottomPoint.y);
+    
+    return path;
+}
+
+- (CGMutablePathRef)createBubbleQQStylePathWithSize:(CGSize)size {
+    CGMutablePathRef path = [self createCornerPathWithSize:size];
+    
+    CGPoint topPoint, bottomPoint, midPoint;
+    
+    midPoint = CGPointMake(0, self.tailTopMargin - self.tailHeight * 0.5);
+    topPoint = CGPointMake(0, self.tailTopMargin);
+    bottomPoint = CGPointMake(0, self.tailTopMargin + self.tailHeight);
+    
+    switch (self.tailPosition) {
+        case HQLChatBubbleViewTailPositionLeft: {
+            CGPoint topCenter = CGPointMake(self.tailWidth + self.viewCornerRadius, self.viewCornerRadius);
+            CGPoint bottomCenter = CGPointMake(self.tailWidth + self.viewCornerRadius, size.height - self.viewCornerRadius);
+            
+            if (self.tailTopMargin < self.viewCornerRadius) {
+                topPoint.x = [self getArcXWithArcCenter:topCenter arcY:topPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleLeftTop];
+            } else if (self.tailTopMargin > size.height - self.viewCornerRadius) {
+                topPoint.x = [self getArcXWithArcCenter:bottomCenter arcY:topPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleLeftDown];
+            } else {
+                topPoint.x = self.tailWidth;
+            }
+            
+            if (self.tailTopMargin + self.tailHeight < self.viewCornerRadius) {
+                bottomPoint.x = [self getArcXWithArcCenter:topCenter arcY:bottomPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleLeftTop];
+            } else if (self.tailTopMargin + self.tailHeight > size.height - self.viewCornerRadius) {
+                bottomPoint.x = [self getArcXWithArcCenter:bottomCenter arcY:bottomPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleLeftDown];
+            } else {
+                bottomPoint.x = self.tailWidth;
+            }
+            
+            midPoint.x = 0;
+            
+            break;
+        }
+        case HQLChatBubbleViewTailPositionRight: {
+            
+            CGPoint topCenter = CGPointMake(size.width - self.tailWidth - self.viewCornerRadius, self.viewCornerRadius);
+            CGPoint bottomCenter = CGPointMake(size.width - self.tailWidth - self.viewCornerRadius, size.height - self.viewCornerRadius);
+            
+            if (self.tailTopMargin < self.viewCornerRadius) {
+                topPoint.x = [self getArcXWithArcCenter:topCenter arcY:topPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleRightTop];
+            } else if (self.tailTopMargin > size.height - self.viewCornerRadius) {
+                topPoint.x = [self getArcXWithArcCenter:bottomCenter arcY:topPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleRightDown];
+            } else {
+                topPoint.x = size.width - self.tailWidth;
+            }
+            
+            if (self.tailTopMargin + self.tailHeight < self.viewCornerRadius) {
+                bottomPoint.x = [self getArcXWithArcCenter:topCenter arcY:bottomPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleRightTop];
+            } else if (self.tailTopMargin + self.tailHeight > size.height - self.viewCornerRadius) {
+                bottomPoint.x = [self getArcXWithArcCenter:bottomCenter arcY:bottomPoint.y radius:self.viewCornerRadius pointPosition:HQLPointPositionInCircleRightDown];
+            } else {
+                bottomPoint.x = size.width - self.tailWidth;
+            }
+            
+            midPoint.x = size.width;
+            
+            break;
+        }
+    }
+    
+    CGPoint topLineMidPoint = [self getTwoPointArcCenterPointWithPointA:topPoint pointB:midPoint arcDirectionUpOrDown:NO];
+    CGPoint bottomLineMidPoint = [self getTwoPointArcCenterPointWithPointA:midPoint pointB:bottomPoint arcDirectionUpOrDown:NO];
+    
+    CGPathMoveToPoint(path, NULL, bottomPoint.x, bottomPoint.y);
+    CGPathAddCurveToPoint(path, NULL, bottomPoint.x, bottomPoint.y, bottomLineMidPoint.x, bottomLineMidPoint.y, midPoint.x, midPoint.y);
+    CGPathAddCurveToPoint(path, NULL, midPoint.x, midPoint.y, topLineMidPoint.x, topLineMidPoint.y, topPoint.x, topPoint.y);
+    
+    return path;
+}
+
+- (CGMutablePathRef)createCornerPathWithSize:(CGSize)size {
+    CGMutablePathRef path = CGPathCreateMutable();
+    
+    CGFloat leftX, rightX;
+    switch (self.tailPosition) {
+        case HQLChatBubbleViewTailPositionLeft: {
+            leftX = self.tailWidth;
+            rightX = size.width;
+            break;
+        }
+        case HQLChatBubbleViewTailPositionRight: {
+            leftX = 0;
+            rightX = size.width - self.tailWidth;
+            break;
+        }
+    }
+    
+    CGPathMoveToPoint(path, NULL, leftX + self.viewCornerRadius, 0);
+    CGPathAddLineToPoint(path, NULL, rightX - self.viewCornerRadius, 0);
+    CGPathAddArcToPoint(path, NULL, rightX, 0, rightX, self.viewCornerRadius, self.viewCornerRadius);
+    
+    CGPathAddLineToPoint(path, NULL, rightX, size.height - self.viewCornerRadius);
+    CGPathAddArcToPoint(path, NULL, rightX, size.height, rightX - self.viewCornerRadius, size.height, self.viewCornerRadius);
+    
+    CGPathAddLineToPoint(path, NULL, leftX + self.viewCornerRadius, size.height);
+    CGPathAddArcToPoint(path, NULL, leftX, size.height, leftX, size.height - self.viewCornerRadius, self.viewCornerRadius);
+    
+    CGPathAddLineToPoint(path, NULL, leftX, self.viewCornerRadius);
+    CGPathAddArcToPoint(path, NULL, leftX, 0, leftX + self.viewCornerRadius, 0, self.viewCornerRadius);
+    
+    return path;
 }
 
 #pragma mark - tool method
@@ -228,23 +501,49 @@
 }
 
 // 根据圆轨迹方程 获得x
-- (CGFloat)getArcXWithArcCenter:(CGPoint)arcCenter arcY:(CGFloat)arcY radius:(CGFloat)radius {
+- (CGFloat)getArcXWithArcCenter:(CGPoint)arcCenter arcY:(CGFloat)arcY radius:(CGFloat)radius pointPosition:(HQLPointPositionInCircle)pointPosition {
     if (radius < 0) {
         return 0;
     }
     CGFloat centerX = arcCenter.x;
     CGFloat centerY = arcCenter.y;
-    return (centerX - sqrt(pow(radius, 2) - pow((centerY - arcY), 2)));
+    CGFloat result = (centerX - sqrt(pow(radius, 2) - pow((centerY - arcY), 2)));
+    // 根据位置获得坐标
+    switch (pointPosition) {
+        case HQLPointPositionInCircleLeftTop:
+        case HQLPointPositionInCircleLeftDown: {
+            return result;
+        }
+        case HQLPointPositionInCircleRightTop:
+        case HQLPointPositionInCircleRightDown: {
+            CGFloat distance = fabs(centerX - result);
+            result = result + 2 * distance;
+            return result;
+        }
+    }
 }
 
 // 根据圆轨迹方程 获得y
-- (CGFloat)getArcYWithArcCenter:(CGPoint)arcCenter arcX:(CGFloat)arcX radius:(CGFloat)radius {
+- (CGFloat)getArcYWithArcCenter:(CGPoint)arcCenter arcX:(CGFloat)arcX radius:(CGFloat)radius pointPosition:(HQLPointPositionInCircle)pointPosition {
     if (radius < 0) {
         return 0;
     }
     CGFloat centerX = arcCenter.x;
     CGFloat centerY = arcCenter.y;
-    return (centerY - sqrt(pow(radius, 2) - pow((centerX - arcX), 2)));
+    CGFloat result = (centerY - sqrt(pow(radius, 2) - pow((centerX - arcX), 2)));
+    // 根据位置获得坐标
+    switch (pointPosition) {
+        case HQLPointPositionInCircleLeftTop:
+        case HQLPointPositionInCircleRightTop:{
+            return result;
+        }
+        case HQLPointPositionInCircleLeftDown:
+        case HQLPointPositionInCircleRightDown: {
+            CGFloat distance = fabs(centerY - result);
+            result = result + 2 * distance;
+            return result;
+        }
+    }
 }
 
 #pragma mark - setter
@@ -252,18 +551,22 @@
 - (void)setFillColor:(UIColor *)fillColor {
     fillColor = fillColor ? fillColor : [UIColor clearColor];
     _fillColor = fillColor;
-    self.maskLayer.fillColor = fillColor.CGColor;
+    self.layer.backgroundColor = fillColor.CGColor;
 }
 
-- (void)setBorderColor:(UIColor *)borderColor {
-    borderColor = borderColor ? borderColor : [UIColor clearColor];
-    _borderColor = borderColor;
-    self.maskLayer.strokeColor = borderColor.CGColor;
+- (void)setTailHeight:(CGFloat)tailHeight {
+    tailHeight = tailHeight < 1 ? 1 : tailHeight;
+    _tailHeight = tailHeight;
 }
 
-- (void)setBorderWidth:(CGFloat)borderWidth {
-    borderWidth = borderWidth < 0 ? 0 : borderWidth;
-    self.maskLayer.borderWidth = borderWidth;
+- (void)setTailTopMargin:(CGFloat)tailTopMargin {
+    tailTopMargin = tailTopMargin < 0 ? 0   : tailTopMargin;
+    _tailTopMargin = tailTopMargin;
+}
+
+- (void)setViewCornerRadius:(CGFloat)viewCornerRadius {
+    viewCornerRadius = viewCornerRadius < 0 ? 0 : viewCornerRadius;
+    _viewCornerRadius = viewCornerRadius;
 }
 
 #pragma mark - getter
@@ -271,9 +574,8 @@
 - (CAShapeLayer *)maskLayer {
     if (!_maskLayer) {
         _maskLayer = [[CAShapeLayer alloc] init];
-//        _maskLayer.frame = self.bounds;
-        
-        [self.layer addSublayer:_maskLayer];
+
+        self.layer.mask = _maskLayer;
     }
     return _maskLayer;
 }

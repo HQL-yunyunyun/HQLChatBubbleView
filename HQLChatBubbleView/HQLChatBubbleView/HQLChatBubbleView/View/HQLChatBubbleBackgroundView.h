@@ -19,22 +19,32 @@ typedef enum {
     HQLChatBubbleViewTailPositionRight , // 在右边
 } HQLChatBubbleViewTailPosition;
 
+@class HQLChatBubbleBackgroundView;
+
+@protocol HQLChatBubbleBackgroundViewDelegate <NSObject>
+
+- (void)chatBubbleBackgroundViewDidChangeFrame:(HQLChatBubbleBackgroundView *)bubbleBackgroundView;
+
+@end
+
 @interface HQLChatBubbleBackgroundView : UIView
 
 @property (assign, nonatomic) CGFloat tailWidth; // 尾巴的宽度 deault 5
-@property (assign, nonatomic) CGFloat tailHeight; // 尾巴的高度 default 8
+@property (assign, nonatomic) CGFloat tailHeight; // 尾巴的高度 default 5
 @property (assign, nonatomic) CGFloat viewCornerRadius; // 圆角 default 10
-@property (assign, nonatomic) CGFloat tailTopMargin; // 尾巴离顶部的margin - iMessages样式不适用 deafult 8
+@property (assign, nonatomic) CGFloat tailTopMargin; // 尾巴离顶部的margin - iMessages样式不适用 deafult 10
 @property (assign, nonatomic) HQLChatBubbleViewStyle style; // 样式
 
-@property (assign, nonatomic) CGFloat contentViewTopMargin; // 顶部margin
-@property (assign, nonatomic) CGFloat contentViewLeftMargin; // 左边margin
-@property (assign, nonatomic) CGFloat contentViewBottomMargin; // 底部margin
-@property (assign, nonatomic) CGFloat contentViewRightMargin; // 右边margin
+@property (assign, nonatomic) CGFloat contentViewTopMargin; // 顶部margin default 0
+@property (assign, nonatomic) CGFloat contentViewLeftMargin; // 左边margin default 0
+@property (assign, nonatomic) CGFloat contentViewBottomMargin; // 底部margin default 0
+@property (assign, nonatomic) CGFloat contentViewRightMargin; // 右边margin default 0
 
 @property (strong, nonatomic) UIColor *fillColor;
-@property (strong, nonatomic) UIColor *borderColor;
-@property (assign, nonatomic) CGFloat borderWidth;
+//@property (strong, nonatomic) UIColor *borderColor;
+//@property (assign, nonatomic) CGFloat borderWidth;
+
+@property (assign, nonatomic) id <HQLChatBubbleBackgroundViewDelegate>delegate;
 
 // set contentView 的时候 会自动调用 drawBubble
 //@property (strong, nonatomic) UIView *contentView; // 显示的contentView [UIimageView 或 UILabel 或其他]

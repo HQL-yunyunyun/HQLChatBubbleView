@@ -21,10 +21,14 @@
     
     self.view.backgroundColor = [UIColor redColor];
     
-    HQLChatBubbleBackgroundView *backView = [[HQLChatBubbleBackgroundView alloc] initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, 200)];
-    backView.backgroundColor = [UIColor blueColor];
+    UIView *testView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    [testView setBackgroundColor:[UIColor clearColor]];
     
-    [backView drawBubble];
+    HQLChatBubbleBackgroundView *backView = [[HQLChatBubbleBackgroundView alloc] initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, 200)];
+    backView.style = HQLChatBubbleViewWeChatStyle;
+//    backView.backgroundColor = [UIColor clearColor];
+    
+    [backView drawBubbleWithContentView:testView tailPosition:HQLChatBubbleViewTailPositionLeft];
     [self.view addSubview:backView];
 }
 
