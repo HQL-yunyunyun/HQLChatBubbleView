@@ -23,6 +23,7 @@ typedef enum {
 
 @protocol HQLChatBubbleBackgroundViewDelegate <NSObject>
 
+@optional
 - (void)chatBubbleBackgroundViewDidChangeFrame:(HQLChatBubbleBackgroundView *)bubbleBackgroundView;
 
 @end
@@ -36,8 +37,8 @@ typedef enum {
 @property (assign, nonatomic) HQLChatBubbleViewStyle style; // 样式
 
 @property (assign, nonatomic) CGFloat contentViewTopMargin; // 顶部margin default 0
-@property (assign, nonatomic) CGFloat contentViewLeftMargin; // 左边margin default 0
-@property (assign, nonatomic) CGFloat contentViewBottomMargin; // 底部margin default 0
+@property (assign, nonatomic) CGFloat contentViewLeftMargin; // 左边margin default 0 --- 要算上tailWidth
+@property (assign, nonatomic) CGFloat contentViewBottomMargin; // 底部margin default 0 --- 要算上tailWidth
 @property (assign, nonatomic) CGFloat contentViewRightMargin; // 右边margin default 0
 
 @property (strong, nonatomic) UIColor *fillColor;

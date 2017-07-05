@@ -68,7 +68,7 @@ typedef enum {
     self.contentViewBottomMargin = 0;
     self.contentViewRightMargin = 0;
     
-    self.fillColor = [UIColor blueColor];
+    self.fillColor = [UIColor whiteColor];
 }
 
 - (void)drawBubble {
@@ -567,6 +567,11 @@ typedef enum {
 - (void)setViewCornerRadius:(CGFloat)viewCornerRadius {
     viewCornerRadius = viewCornerRadius < 0 ? 0 : viewCornerRadius;
     _viewCornerRadius = viewCornerRadius;
+}
+
+- (void)setTailWidth:(CGFloat)tailWidth {
+    tailWidth = tailWidth < 0 ? 1 : tailWidth;
+    _tailWidth = tailWidth;
 }
 
 #pragma mark - getter

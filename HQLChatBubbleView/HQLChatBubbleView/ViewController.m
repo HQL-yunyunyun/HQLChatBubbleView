@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 
-#import "HQLChatBubbleBackgroundView.h"
+#import "HQLChatBubbleView.h"
 
 @interface ViewController ()
 
@@ -19,17 +19,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor redColor];
+    self.view.backgroundColor = [UIColor whiteColor];
     
-    UIView *testView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-    [testView setBackgroundColor:[UIColor clearColor]];
-    
-    HQLChatBubbleBackgroundView *backView = [[HQLChatBubbleBackgroundView alloc] initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, 200)];
-    backView.style = HQLChatBubbleViewWeChatStyle;
-//    backView.backgroundColor = [UIColor clearColor];
-    
-    [backView drawBubbleWithContentView:testView tailPosition:HQLChatBubbleViewTailPositionLeft];
-    [self.view addSubview:backView];
+    HQLChatBubbleView *bubbleView = [[HQLChatBubbleView alloc] initWithFrame:CGRectMake(100, 100, 10, 10)];
+    bubbleView.fillColor = [UIColor greenColor];
+    bubbleView.style = HQLChatBubbleViewWeChatStyle;
+    bubbleView.viewCornerRadius = 5;
+    bubbleView.tailWidth = 3;
+    bubbleView.tailTopMargin = 5;
+    [bubbleView drawBubbleWithString:@"这" tailPosition:HQLChatBubbleViewTailPositionRight];
+    [self.view addSubview:bubbleView];
 }
 
 
